@@ -31,7 +31,9 @@ SCRIPT
 Vagrant.configure("2") do |config|
   config.vm.box = "centos/7"
   # disable synced folder - https://seven.centos.org/2017/03/updated-centos-vagrant-images-available-v1702-01/
-  config.vm.synced_folder ".", "/vagrant", disabled: true
+  #config.vm.synced_folder ".", "/vagrant", disabled: true
+  # this image uses rsync as default. needs vagrant-vbguest 
+  config.vm.synced_folder ".", "/vagrant", type: "virtualbox"
   config.vm.hostname = "nomad"
   config.vm.provision "shell", inline: $script, privileged: false
   config.vm.provision "docker" # just install it
