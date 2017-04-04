@@ -2,7 +2,7 @@
 log_level = "DEBUG"
 
 # Setup data dir
-data_dir = "/tmp/server1"
+data_dir = "/etc/nomad.d"
 
 # Enable the server
 server {

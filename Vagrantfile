@@ -29,6 +29,11 @@ SCRIPT
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
 Vagrant.configure("2") do |config|
+# Increase memory for VirtualBox
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "1024"
+  end
+
   config.vm.box = "centos/7"
   # disable synced folder - https://seven.centos.org/2017/03/updated-centos-vagrant-images-available-v1702-01/
   #config.vm.synced_folder ".", "/vagrant", disabled: true
@@ -38,9 +43,19 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", inline: $script, privileged: false
   config.vm.provision "docker" # just install it
 
-  # Increase memory for VirtualBox
-  config.vm.provider "virtualbox" do |vb|
-    vb.memory = "1024"
+  config.vm.define 'server1' do |manager1|
+    manager1.vm.hostname = 'server1'
+    manager1.vm.provision 'shell', inline: 'cp /vagrant/cluster/server.hcl /etc/nomad.d/server.hcl'
+  end
+
+  config.vm.define 'client1' do |client1|
+    client1.vm.hostname = 'client1'
+    client1.vm.provision 'shell', inline: 'cp /vagrant/cluster/client.hcl /etc/nomad.d/client.hcl'
+  end
+
+  config.vm.define 'client2' do |client2|
+    client2.vm.hostname = 'client2'
+    client2.vm.provision 'shell', inline: 'cp /vagrant/cluster/client.hcl /etc/nomad.d/client.hcl'
   end
 
 end
