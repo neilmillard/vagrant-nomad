@@ -48,7 +48,6 @@ Vagrant.configure("2") do |config|
     manager1.vm.hostname = 'server1'
     manager1.vm.provision 'shell', inline: 'cp /vagrant/cluster/server.hcl /etc/nomad.d/server.hcl'
     manager1.vm.network "private_network", ip: "192.168.50.2"
-    manager1.vm.network "forwarded_port", guest: 3000, host: 13000 # allow access to port 3000 (hashi-ui)
   end
 
   config.vm.define 'client1' do |client1|
