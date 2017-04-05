@@ -2,7 +2,7 @@
 
 ```
 vagrant ssh server1
-sudo nomad agent -config=/etc/nomad.d/server.hcl
+sudo bash -c 'nomad agent -config=/etc/nomad.d/server.hcl >/var/log/nomad &'
 ```
 ## start clients
 ```

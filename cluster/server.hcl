@@ -1,3 +1,5 @@
+bind_addr = "0.0.0.0" # the default
+
 # Increase log verbosity
 log_level = "DEBUG"
 

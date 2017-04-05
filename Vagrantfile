@@ -20,7 +20,8 @@ sudo mkdir -p /etc/nomad.d
 sudo chmod a+w /etc/nomad.d
 
 # Set hostname's IP to made advertisement Just Work
-sudo sed -i -e "s/.*nomad.*/$(ip route get 1 | awk '{print $NF;exit}') nomad/" /etc/hosts
+sudo sed -i -e "s/.*server.*/$(ip route get 192.168.50 | awk '{print $NF;exit}') $(hostname)/" /etc/hosts
+sudo sed -i -e "s/.*client.*/$(ip route get 192.168.50 | awk '{print $NF;exit}') $(hostname)/" /etc/hosts
 
 SCRIPT
 
@@ -46,16 +47,20 @@ Vagrant.configure("2") do |config|
   config.vm.define 'server1' do |manager1|
     manager1.vm.hostname = 'server1'
     manager1.vm.provision 'shell', inline: 'cp /vagrant/cluster/server.hcl /etc/nomad.d/server.hcl'
+    manager1.vm.network "private_network", ip: "192.168.50.2"
+    manager1.vm.network "forwarded_port", guest: 3000, host: 13000 # allow access to port 3000 (hashi-ui)
   end
 
   config.vm.define 'client1' do |client1|
     client1.vm.hostname = 'client1'
     client1.vm.provision 'shell', inline: 'cp /vagrant/cluster/client.hcl /etc/nomad.d/client.hcl'
+    client1.vm.network "private_network", ip: "192.168.50.3"
   end
 
   config.vm.define 'client2' do |client2|
     client2.vm.hostname = 'client2'
     client2.vm.provision 'shell', inline: 'cp /vagrant/cluster/client.hcl /etc/nomad.d/client.hcl'
+    client2.vm.network "private_network", ip: "192.168.50.4"
   end
 
 end
