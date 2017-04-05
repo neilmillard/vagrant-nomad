@@ -6,6 +6,18 @@ $script = <<SCRIPT
 sudo yum -y update
 sudo yum install -y unzip curl wget vim
 
+# Download consul
+echo Fetching Consul...
+cd /tmp/
+curl -sSL https://releases.hashicorp.com/consul/0.7.5/consul_0.7.5_linux_amd64.zip -o consul.zip
+echo Installing Consul...
+unzip consul.zip
+sudo chmod +x consul
+sudo mv consul /usr/bin/consul
+
+sudo mkdir -p /etc/consul.d
+sudo chmod a+w /etc/consul.d
+
 # Download Nomad
 echo Fetching Nomad...
 cd /tmp/
@@ -25,19 +37,34 @@ sudo sed -i -e "s/.*client.*/$(ip route get 192.168.50 | awk '{print $NF;exit}')
 
 SCRIPT
 
+$server = <<SERVER
+sudo cp /vagrant/consul/server.json /etc/consul.d/server.json
+sudo cp /vagrant/nomad/server.hcl /etc/nomad.d/server.hcl
+echo starting consul agent
+sudo bash -c 'consul agent -config-dir /etc/consul.d >/var/log/consul &'
+SERVER
+
+$client = <<CLIENT
+sudo cp /vagrant/consul/client.json /etc/consul.d/client.json
+sudo cp /vagrant/nomad/client.hcl /etc/nomad.d/client.hcl
+echo starting consul agent
+sudo bash -c "consul agent -config-dir /etc/consul.d -advertise $(ip route get 192.168.50 | awk '{print $NF;exit}') >/var/log/consul &"
+
+CLIENT
+
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
 # configures the configuration version (we support older styles for
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
 Vagrant.configure("2") do |config|
-# Increase memory for VirtualBox
+  # Increase memory for VirtualBox
   config.vm.provider "virtualbox" do |vb|
     vb.memory = "1024"
   end
 
   config.vm.box = "centos/7"
   # disable synced folder - https://seven.centos.org/2017/03/updated-centos-vagrant-images-available-v1702-01/
-  #config.vm.synced_folder ".", "/vagrant", disabled: true
+  # config.vm.synced_folder ".", "/vagrant", disabled: true
   # this image uses rsync as default. needs vagrant-vbguest
   config.vm.synced_folder ".", "/vagrant", type: "virtualbox"
   config.vm.hostname = "nomad"
@@ -46,20 +73,20 @@ Vagrant.configure("2") do |config|
 
   config.vm.define 'server1' do |manager1|
     manager1.vm.hostname = 'server1'
-    manager1.vm.provision 'shell', inline: 'cp /vagrant/cluster/server.hcl /etc/nomad.d/server.hcl'
-    manager1.vm.network "private_network", ip: "192.168.50.2"
+    manager1.vm.provision "shell", inline: $server, privileged: false
+    manager1.vm.network 'private_network', ip: '192.168.50.2'
   end
 
   config.vm.define 'client1' do |client1|
     client1.vm.hostname = 'client1'
-    client1.vm.provision 'shell', inline: 'cp /vagrant/cluster/client.hcl /etc/nomad.d/client.hcl'
-    client1.vm.network "private_network", ip: "192.168.50.3"
+    client1.vm.provision 'shell', inline: $client, privileged: false
+    client1.vm.network 'private_network', ip: '192.168.50.3'
   end
 
   config.vm.define 'client2' do |client2|
     client2.vm.hostname = 'client2'
-    client2.vm.provision 'shell', inline: 'cp /vagrant/cluster/client.hcl /etc/nomad.d/client.hcl'
-    client2.vm.network "private_network", ip: "192.168.50.4"
+    client2.vm.provision 'shell', inline: $client, privileged: false
+    client2.vm.network 'private_network', ip: '192.168.50.4'
   end
 
 end

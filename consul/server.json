@@ -1,0 +1,10 @@
+{
+  "datacenter": "dc1",
+  "data_dir": "/tmp/consul",
+  "log_level": "DEBUG",
+  "bind_addr": "0.0.0.0",
+  "server": true,
+  "ui": true,
+  "advertise_addr": "192.168.50.2",
+  "bootstrap_expect": 1
+}
