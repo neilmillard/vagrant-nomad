@@ -18,6 +18,10 @@ sudo mv consul /usr/bin/consul
 sudo mkdir -p /etc/consul.d
 sudo chmod a+w /etc/consul.d
 
+sudo mkdir -p /opt/consul
+sudo chmod a+w /opt/consul
+
+
 # Download Nomad
 echo Fetching Nomad...
 cd /tmp/
@@ -30,6 +34,9 @@ sudo mv nomad /usr/bin/nomad
 
 sudo mkdir -p /etc/nomad.d
 sudo chmod a+w /etc/nomad.d
+
+sudo mkdir -p /opt/nomad
+sudo chmod a+w /opt/nomad
 
 # Set hostname's IP to made advertisement Just Work
 sudo sed -i -e "s/.*server.*/$(ip route get 192.168.50 | awk '{print $NF;exit}') $(hostname)/" /etc/hosts

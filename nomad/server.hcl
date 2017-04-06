@@ -4,7 +4,7 @@ bind_addr = "0.0.0.0" # the default
 log_level = "DEBUG"
 
 # Setup data dir
-data_dir = "/etc/nomad.d"
+data_dir = "/opt/nomad"
 
 # Enable the server
 server {

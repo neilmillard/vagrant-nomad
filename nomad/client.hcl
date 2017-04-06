@@ -2,7 +2,7 @@
 log_level = "DEBUG"
 
 # Setup data dir
-data_dir = "/etc/nomad.d"
+data_dir = "/opt/nomad"
 
 # Enable the client
 client {
