@@ -49,6 +49,8 @@ sudo cp /vagrant/consul/server.json /etc/consul.d/server.json
 sudo cp /vagrant/nomad/server.hcl /etc/nomad.d/server.hcl
 echo starting consul agent
 sudo bash -c 'consul agent -config-dir /etc/consul.d >/var/log/consul &'
+echo starting nomad agent
+sudo bash -c 'nomad agent -config=/etc/nomad.d/server.hcl >/var/log/nomad &'
 SERVER
 
 $client = <<CLIENT
@@ -56,7 +58,8 @@ sudo cp /vagrant/consul/client.json /etc/consul.d/client.json
 sudo cp /vagrant/nomad/client.hcl /etc/nomad.d/client.hcl
 echo starting consul agent
 sudo bash -c "consul agent -config-dir /etc/consul.d -advertise $(ip route get 192.168.50 | awk '{print $NF;exit}') >/var/log/consul &"
-
+echo starting nomad agent
+sudo bash -c 'nomad agent -config=/etc/nomad.d/client.hcl >/var/log/nomad &'
 CLIENT
 
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
